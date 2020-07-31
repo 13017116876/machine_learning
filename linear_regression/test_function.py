@@ -1,3 +1,16 @@
+dict = {}
+for each in ["1","2","1","3"]:
+    if each in dict.keys():
+        dict[each]+=1
+    else:
+        dict[each]=1
+sorted(dict_data.items(),key=lambda x:x[1])
+print(list(dict.items())[:2])
+exit()
+x = "123141"
+print(list(x))
+exit()
+
 s = {"b":2,"x":3,"c":4}
 print([s])
 exit()

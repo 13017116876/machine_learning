@@ -10,9 +10,9 @@
 """
 import numpy as np
 import math
-class LinearRegression(object)
+class LinearRegression(object):
 
-    def init(self,iter):        
+    def __init__(self,iter):        
         self.w = np.random.normal(1,0.1)
         self.b = np.random.normal(1,0.1) # 创建b
         self.iter = iter
@@ -28,7 +28,7 @@ class LinearRegression(object)
             raise "data length is not equal with label length"
         self.x=x # x的特征数据
         self.y=y # y标签
-        for i in self.iter: # 遍历每一次迭代
+        for i in range(self.iter): # 遍历每一次迭代
             self.step() # 迭代
             self.loss_arr.append(self.loss()) # 添加损失函数值
 
@@ -52,8 +52,8 @@ class LinearRegression(object)
         return loss
 
     def cal_gradient(self):
-        d_w = np.mean((self.w*self.x+self.b-self.y)) * self.x) #这里是用全部元素求损失函数
-        d_b = np.mean((self.w*self.x+self.b-self.y))
+        d_w = np.mean((self.w*self.x+self.b-self.y) * self.x) #这里是用全部元素求损失函数
+        d_b = np.mean(self.w*self.x+self.b-self.y)
         return d_w,d_b
 
     def step(self):
