@@ -1,0 +1,7 @@
+这里本来只用了100条数据，迭代了100次，发现效果还行，不到最佳，后来发现是迭代次数太少还没收敛
+然后调整迭代次数到1000，发现效果还是有点差距，是因为100条数据太少，因为加了随机数，所以数据不稳定，可能会波动比较大，然后调整数据量，得到准确结果
+
+
+linear_regression_sgd用的是单个梯度下降，测试之和收敛速度提升了一点，精确度可能略微下降，不过精确度还行
+
+如果要使用linear_regression_sgd，将data_generate.py中第三行改成from linear_regression_sgd import LinearRegression

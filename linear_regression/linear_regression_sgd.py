@@ -30,9 +30,10 @@ class LinearRegression(object):
         self.x=x # x的特征数据
         self.y=y # y标签
         for i in tqdm(range(self.iter)): # 遍历每一次迭代
-            w_value,b_value = self.step() # 迭代
-            # print("loss 值为%d"%self.loss())
-            # self.loss_arr.append(self.loss()) # 添加损失函数值 ，如果去掉这一部分，结果生成会很快
+            r = np.random.randint(0,len(x))
+            w_value,b_value = self.step(r) # 迭代
+            print("loss 值为%d"%self.loss())
+            self.loss_arr.append(self.loss()) # 添加损失函数值
         return w_value,b_value
 
 
@@ -55,21 +56,13 @@ class LinearRegression(object):
         loss_value = self.mean_reduce(self.predict(),self.y)
         return loss_value
 
-    def cal_gradient(self):
-        d_w = np.mean((self.w*self.x+self.b-self.y) * self.x) #这里是用全部元素求损失函数
-        d_b = np.mean(self.w*self.x+self.b-self.y)
+    def cal_gradient(self,r):
+        d_w = np.mean((self.w*self.x[r]+self.b-self.y[r]) * self.x[r]) #这里是用全部元素求损失函数
+        d_b = np.mean(self.w*self.x[r]+self.b-self.y[r])
         return d_w,d_b
 
-    def step(self):
-        d_w,d_b = self.cal_gradient()
+    def step(self,r):
+        d_w,d_b = self.cal_gradient(r)
         self.w = self.w - self.lr*d_w # 调整w
         self.b = self.b - self.lr*d_b # 调整b
         return self.w, self.b
-
-
-    
-
-    
-
-    
-        
