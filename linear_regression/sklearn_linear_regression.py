@@ -15,3 +15,5 @@ model = linear_model.LinearRegression()
 model.fit(x_train,y_train)
 print(model.coef_)
 print(model.intercept_)
+
+
