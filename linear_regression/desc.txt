@@ -5,3 +5,5 @@
 linear_regression_sgd用的是单个梯度下降，测试之和收敛速度提升了一点，精确度可能略微下降，不过精确度还行
 
 如果要使用linear_regression_sgd，将data_generate.py中第三行改成from linear_regression_sgd import LinearRegression
+
+multi_regression里面是利用这里是利用sklearn中的波士顿房价做多元线性回归，没有手动写多元线性回归
