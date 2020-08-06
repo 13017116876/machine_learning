@@ -12,20 +12,18 @@ class LogisticRegression(object):
         self.lr = LR
 
     def train(self,x,y,label):
+        self.x = x
+        self.y = y
         for i in range(self.iter):
-            self.step(x,y)
+            self.step()
 
     def cal_grad():
-
-
+        
+                          
     def step(x,y)
         d_w,d_b = self.cal_grad()
         self.w = self.w - self.lr*d_w
         self.b = self.b - self.lr*d_b
-
-
-
-    
 
 
 def load_data(file):
