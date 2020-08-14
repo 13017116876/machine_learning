@@ -1,5 +1,5 @@
 
-# 这个是手动实现的逻辑回归，LR这里设置0.1收敛较快，而前面的多元线性回归 设置大了就不行，回头要看看LR的选取规则
+# 这个是手动实现的线性逻辑回归，LR这里设置0.1收敛较快，而前面的多元线性回归 设置大了就不行，回头要看看LR的选取规则
 import matplotlib.pyplot as plt
 import numpy as np
 import math
