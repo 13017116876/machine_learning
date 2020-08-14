@@ -74,6 +74,7 @@ w,b = model.train(x,y)
 print(w)
 print(b)
 
+# 下面是画图
 ax = plt.figure().add_subplot(111,projection='3d')
 ax.scatter(x[:,0],x[:,1],y,c='r',marker='o',s=100)
 x0 = x[:,0]

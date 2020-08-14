@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import pandas as pd
-ITER = 5000
+ITER = 1000
 ALPHA = 0.3
 LR = 0.1
 class LogisticRegression(object):
@@ -58,12 +58,12 @@ def plot_graph(x,y,w,b):
         else:
             plt.scatter(x[i][0],x[i][1],color="green",s=50)
     # print(x.iloc[0,:].min())
-    hSpots = np.linspace(x.iloc[0,:].min(), x.iloc[0,:].max(), 100)
-    vSpots = -(b[0] + w[0]*hSpots)/w[1]
-    plt.plot(hSpots,vSpots,color="red")
+    # hSpots = np.linspace(x.iloc[0,:].min(), x.iloc[0,:].max(), 100)
+    # vSpots = -(b[0] + w[0]*hSpots)/w[1]
+    # plt.plot(hSpots,vSpots,color="red")
     plt.show()
 
-x,y = load_data(r"D:\machine_learning\logicstic_regression\data\linear.txt")
+x,y = load_data(r"D:\machine_learning\logicstic_regression\data\non_linear.txt")
 model = LogisticRegression()
 model.train(x,y)
 plot_graph(x,y,model.w,model.b)
@@ -71,9 +71,6 @@ print(model.w)
 print(model.b)
 
 
-# plt.scatter(x[:20],y[:20], c=label[:20],s=50,cmap='viridis')
-# plt.xlabel("x")
-# plt.ylabel("y")
 
         
     
