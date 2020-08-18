@@ -1,0 +1,8 @@
+天气 温度 湿度 是否有风 打
+sunny hot high FALSE no
+sunny hot high TRUE no
+overcast hot high FALSE yes
+rainy mild high FALSE yes
+rainy cool normal FALSE yes
+rainy cool normal TRUE no
+overcast cool normal TRUE yes

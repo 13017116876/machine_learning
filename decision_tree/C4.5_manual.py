@@ -1,4 +1,4 @@
-# 手写决策树  也写了预测  没有画图,只做了全部分类之后才停止
+# 由于ID3采用的信息增益的方法会对属性值较多的特征更有优势，会得到更大的值
 import pandas as pd
 import math
 from collections import Counter
@@ -28,7 +28,6 @@ def cal_condition_entropy(x,y):
     return condition_entropy
 
 def cal_info_gain(x,y):
-    # 初始化一个字典
     dic = {}
     # 计算熵
     init_entropy = cal_shanong(y)
@@ -38,10 +37,11 @@ def cal_info_gain(x,y):
     # 遍历x的每一列
     for i in range(x.shape[1]):
         condition_x = x.iloc[:,i]
+        punish = cal_shanong(condition_x)
         # 计算每一列的条件熵
         condition_entropy = cal_condition_entropy(condition_x,y)
         # 得到每一列信息增益
-        dic[condition_x.name] = init_entropy - condition_entropy
+        dic[condition_x.name] = (init_entropy - condition_entropy)/(punish+0.1) # 防止punish为0
     # print(dic)
     new_dic = dict(sorted(dic.items(), key=lambda x:x[1], reverse=True))
     # 得到信息熵最大的那一列名
@@ -72,6 +72,7 @@ def create_dic1(x,y):
                 # dic[max_info][li[i]] = create_dic1(x[x[max_info]==li[i]].drop(max_info,axis=1),y[x[max_info][x[max_info]==li[i]].index.tolist()])
             # print(y[x[max_info][x[max_info]==li[i]].index.tolist()])
     return dic
+
 
 def create_dic(x, y):
     # 获取当前列的最大信息增益列
@@ -109,15 +110,12 @@ def get_result(data,decision_tree):
     # print(key)
 
 def pred(data,dic):
-    result_li = []
     for i in range(data.shape[0]):
         data_single = data.iloc[i]
         # print(data_single)
         result = get_result(data_single,dic)
-        result_li.append(result)
+        return result
         # print(result)
-    return result_li
-
 
 def tree_plot(di):
     pass
@@ -127,6 +125,7 @@ dic = create_dic(x,y) # 得到决策树字典，接下来就是画图，先放�
 print(dic)
 data = pd.read_table(r"D:\machine_learning\decision_tree\test", encoding="utf-8",delimiter=" ")
 predict = pred(data,dic)
+
 
 
 

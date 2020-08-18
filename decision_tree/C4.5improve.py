@@ -1,4 +1,4 @@
-# 手写决策树  也写了预测  没有画图,只做了全部分类之后才停止
+# 为了解决ID3对属性值较多的有优势而提出的C4.5算法显得对属性值较少的更有优势，为了平衡这两个算法，我们通常先取信息增益大于平均值的，然后在计算他们的信息增益率
 import pandas as pd
 import math
 from collections import Counter
@@ -28,8 +28,8 @@ def cal_condition_entropy(x,y):
     return condition_entropy
 
 def cal_info_gain(x,y):
-    # 初始化一个字典
     dic = {}
+    dic_filter = {}
     # 计算熵
     init_entropy = cal_shanong(y)
     # 这里判断是否已经全部是一种结果
@@ -38,12 +38,25 @@ def cal_info_gain(x,y):
     # 遍历x的每一列
     for i in range(x.shape[1]):
         condition_x = x.iloc[:,i]
+        punish = cal_shanong(condition_x)
         # 计算每一列的条件熵
         condition_entropy = cal_condition_entropy(condition_x,y)
         # 得到每一列信息增益
-        dic[condition_x.name] = init_entropy - condition_entropy
-    # print(dic)
-    new_dic = dict(sorted(dic.items(), key=lambda x:x[1], reverse=True))
+        dic[condition_x.name] = init_entropy - condition_entropy # 防止punish为0
+    avg = sum(dic.values())/len(dic)
+    for j in range(x.shape[1]):
+        condition_x = x.iloc[:,j]
+        punish = cal_shanong(condition_x)
+        # 计算每一列的条件熵
+        condition_entropy = cal_condition_entropy(condition_x,y)
+        if init_entropy - condition_entropy >= avg:
+
+        # 得到每一列信息增益
+            dic_filter[condition_x.name] = (init_entropy - condition_entropy)/(punish+0.1) # 防止punish为0
+        else:
+            continue
+    new_dic = dict(sorted(dic_filter.items(), key=lambda x:x[1], reverse=True))
+    print(new_dic)
     # 得到信息熵最大的那一列名
     max_info = list(new_dic.keys())[0]
     return max_info
@@ -109,24 +122,22 @@ def get_result(data,decision_tree):
     # print(key)
 
 def pred(data,dic):
-    result_li = []
     for i in range(data.shape[0]):
         data_single = data.iloc[i]
         # print(data_single)
         result = get_result(data_single,dic)
-        result_li.append(result)
+        return result
         # print(result)
-    return result_li
-
 
 def tree_plot(di):
     pass
 
-x, y = data_load("D:\machine_learning\decision_tree\play_tennis")
+x, y = data_load(r"D:\machine_learning\decision_tree\play_tennis")
 dic = create_dic(x,y) # 得到决策树字典，接下来就是画图，先放下了
 print(dic)
 data = pd.read_table(r"D:\machine_learning\decision_tree\test", encoding="utf-8",delimiter=" ")
 predict = pred(data,dic)
+
 
 
 
