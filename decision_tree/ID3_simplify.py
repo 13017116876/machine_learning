@@ -76,6 +76,7 @@ def create_dic1(x,y):
 def create_dic(x, y):
     # 获取当前列的最大信息增益列
     max_info = cal_info_gain(x,y)
+    
     # 获取当前列有几个分类
     li = list(set(x[max_info]))
     dic_result[max_info] = {}

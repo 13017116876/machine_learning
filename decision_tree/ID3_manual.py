@@ -1,12 +1,12 @@
-# 手写决策树  也写了预测  没有画图,只做了全部分类之后才停止
+# 手写决策树  也写了预测  没有画图,只做了全部分类之后才停止,ID3本身算法就没有剪枝操作
 import pandas as pd
 import math
 from collections import Counter
 dic_result = {}
 def data_load(file):
     data = pd.read_table(file, encoding="utf-8",delimiter=" ")
-    X_data = data.iloc[:,0:4]
-    Y_data = data.iloc[:,4]
+    X_data = data.iloc[:,0:1]
+    Y_data = data.iloc[:,1]
     return X_data,Y_data
 
 def cal_shanong(y):
@@ -74,6 +74,7 @@ def create_dic1(x,y):
     return dic
 
 def create_dic(x, y):
+    # TODO 如果一开始就是全部分好的，max_info会是empty，数据中找不到这一列
     # 获取当前列的最大信息增益列
     max_info = cal_info_gain(x,y)
     # 获取当前列有几个分类
