@@ -82,38 +82,44 @@ def cal_condition_entropy(x,y):
 
 def cal_info_gain_missing(x,y,y_weight):
     max_info_gini_rato = 0
+    init_entropy1 = cal_shanong(y) # 这里判断是否全为一个类别
+    # 这里判断是否已经全部是一种结果
+    if init_entropy1 == 0:
+        return "empty"
     for i in range(x.shape[1]): # 遍历每一列 
         x_correct = x.iloc[:,i].notnull() # 获取没缺失值的x数据
         y_correct = y[x_correct] # 获取非空的y
         init_entropy = cal_shanong_missing(y_correct,y_weight) # 初始熵
-        p = len(y_correct)/len(y) # 非缺失值比例
+        p = np.dot(np.ones(len(y_correct)),y_weight[y_correct.index.tolist()].T) / np.dot(np.ones(len(y)), y_weight[y.index.tolist()].T)
+        # p = len(y_correct)/len(y) # 非缺失值比例
         condition_entropy = cal_condition_entropy_missing(x.iloc[:,i][x_correct],y_correct,y_weight)
         punish = cal_shanong_missing(x.iloc[:,i][x_correct],y_weight)
         info_gain = p*(init_entropy - condition_entropy)/(punish+0.01) 
         if info_gain > max_info_gini_rato: # 如果当前的信息增益率大于之前的信息增益率，则更新max_info_gini_rato和max_info
             max_info_gini_rato = info_gain
             max_info = x_correct.name
-        if max_info_gini_rato < THRESHOLD:
-            return "cancel"
+    if max_info_gini_rato < THRESHOLD:
+        return "cancel"
     return max_info
 
 
 def create_dic_missing(x,y,y_weight):
-    dic = {}
-    max_info = cal_info_gain_missing(x,y,y_weight)
+    dic = {} 
+    max_info = cal_info_gain_missing(x,y,y_weight) # 得到最大的信息增益
     dic[max_info] = {}
     # 获取当前列有几个分类
     li = x[max_info].unique() #list(set(x[max_info]))
     # print(dic_result)
     # 遍历每一个分类
-    for i in range(len(li)):
-        y_weight[x[max_info].isnull()] = len(y[x[max_info]==li[i]])/len(y[x[max_info].notnull()])
+    for i in range(len(li)): 
+        y_weight1 = pd.Series(np.ones(len(y)))
+        y_weight1[x[max_info][x[max_info].isnull()].index.tolist()] = len(y[x[max_info]==li[i]])/len(y[x[max_info].notnull()]) # 这里是因为x[max_info].isnull()是六维的，y_weight是14维
+        # print(y_weight)
         if x.shape[1] == 1:  # 如果此时只有一列了，则此时根据该种类中哪个分类多归为哪个标签
             dic[max_info][li[i]] = cal_y_cato(y[x[max_info][x[max_info]==li[i]].index.tolist()])
         else:
             # 获取去除当前列情况下的继续求最大增益
-            print(y[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()])
-            max1 = cal_info_gain_missing(x[(x[max_info]==li[i]) | (x[max_info].isnull())].drop(max_info,axis=1), y[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()],y_weight)
+            max1 = cal_info_gain_missing(x[(x[max_info]==li[i]) | (x[max_info].isnull())].drop(max_info,axis=1), y[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()],y_weight1[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()])
             # 如果max1等于empty就代表此时该小数据已经分隔开
             if max1 == "empty":
                 dic[max_info][li[i]] = list(set(y[x[max_info][x[max_info]==li[i]].index.tolist()]))[0]
@@ -121,7 +127,7 @@ def create_dic_missing(x,y,y_weight):
                 dic[max_info][li[i]] = cal_y_cato(y[x[max_info][x[max_info]==li[i]].index.tolist()])
             # 否则就再这个基础上继续求最大信息增益
             else:
-                dic[max_info][li[i]] = create_dic_missing(x[x[max_info]==li[i]].drop(max_info,axis=1),y[x[max_info][x[max_info]==li[i]].index.tolist()],y_weight)
+                dic[max_info][li[i]] = create_dic_missing(x[(x[max_info]==li[i]) | (x[max_info].isnull())].drop(max_info,axis=1),y[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()],y_weight1[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()])
     return dic
 
 def classfier(x, y,y_weight):
@@ -166,7 +172,8 @@ def tree_plot(di):
 x, y = data_load(r"D:\machine_learning\decision_tree\play_tennis",5)
 x.iloc[1,2] = np.nan # 为了处理缺失值问题，设置的一个缺失值
 x.iloc[2,0] = np.nan 
-dic = classfier(x,y,np.ones(len(y))) # 得到决策树字典，接下来就是画图，先放下了
+y_weight = pd.Series(np.ones(len(y)))
+dic = classfier(x,y,y_weight) # 得到决策树字典，接下来就是画图，先放下了
 print(dic)
 # data = pd.read_table(r"D:\machine_learning\decision_tree\test", encoding="utf-8",delimiter=" ")
 # predict = pred(data,dic)
