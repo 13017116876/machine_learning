@@ -16,6 +16,7 @@
 """
 # # 为了解决ID3对属性值较多的有优势而提出的C4.5算法显得对属性值较少的更有优势，为了平衡这两个算法，我们通常先取信息增益大于平均值的，然后在计算他们的信息增益率，这个代码写在C4.5improve中
 # 缺失值处理， 主要是在于计算信息增益时候的改变 https://blog.csdn.net/leaf_zizi/article/details/83503167这篇文章讲的清晰，有例题
+# 缺失值目前可以跑通，内部权重细节有待于进一步修改
 
 import numpy as np
 import pandas as pd
@@ -103,7 +104,7 @@ def cal_info_gain_missing(x,y,y_weight):
     return max_info
 
 
-def create_dic_missing(x,y,y_weight):
+def create_dic_missing(x,y,y_weight,y_num):
     dic = {} 
     max_info = cal_info_gain_missing(x,y,y_weight) # 得到最大的信息增益
     dic[max_info] = {}
@@ -112,7 +113,11 @@ def create_dic_missing(x,y,y_weight):
     # print(dic_result)
     # 遍历每一个分类
     for i in range(len(li)): 
-        y_weight1 = pd.Series(np.ones(len(y)))
+        print(li[i])
+        print(li[i] == None)
+        if li[i] == None:
+            continue
+        y_weight1 = pd.Series(np.ones(y_num))
         y_weight1[x[max_info][x[max_info].isnull()].index.tolist()] = len(y[x[max_info]==li[i]])/len(y[x[max_info].notnull()]) # 这里是因为x[max_info].isnull()是六维的，y_weight是14维
         # print(y_weight)
         if x.shape[1] == 1:  # 如果此时只有一列了，则此时根据该种类中哪个分类多归为哪个标签
@@ -127,7 +132,7 @@ def create_dic_missing(x,y,y_weight):
                 dic[max_info][li[i]] = cal_y_cato(y[x[max_info][x[max_info]==li[i]].index.tolist()])
             # 否则就再这个基础上继续求最大信息增益
             else:
-                dic[max_info][li[i]] = create_dic_missing(x[(x[max_info]==li[i]) | (x[max_info].isnull())].drop(max_info,axis=1),y[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()],y_weight1[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()])
+                dic[max_info][li[i]] = create_dic_missing(x[(x[max_info]==li[i]) | (x[max_info].isnull())].drop(max_info,axis=1),y[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()],y_weight1[x[(x[max_info]==li[i]) | (x[max_info].isnull())].index.tolist()],y_num)
     return dic
 
 def classfier(x, y,y_weight):
@@ -144,7 +149,8 @@ def classfier(x, y,y_weight):
         return dic_result
     else:
         # 否则使用创建字典
-        dic_result["result"] = create_dic_missing(x,y,y_weight)
+        y_num = len(y)
+        dic_result["result"] = create_dic_missing(x,y,y_weight,y_num)
     return dic_result
 
 def get_result(data,decision_tree):
@@ -170,8 +176,8 @@ def tree_plot(di):
     pass
 
 x, y = data_load(r"D:\machine_learning\decision_tree\play_tennis",5)
-x.iloc[1,2] = np.nan # 为了处理缺失值问题，设置的一个缺失值
-x.iloc[2,0] = np.nan 
+x.iloc[1,2] = None # 为了处理缺失值问题，设置的一个缺失值
+x.iloc[2,0] = None 
 y_weight = pd.Series(np.ones(len(y)))
 dic = classfier(x,y,y_weight) # 得到决策树字典，接下来就是画图，先放下了
 print(dic)
